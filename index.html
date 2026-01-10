@@ -18,7 +18,7 @@ canvas{display:block;margin:auto}
 
 <div id="ui">
 Rotation (rt):<br>
-<input id="rot" type="number" value="50"><br>
+<input id="rot" type="number" value="500"><br>
 <button onclick="start()">Download Reel</button>
 </div>
 
@@ -95,7 +95,7 @@ function watermark(){
 
 // video
 async function record(){
- const stream=canvas.captureStream(60);
+ const stream=canvas.captureStream(120);
  rec=new MediaRecorder(stream,{mimeType:"video/webm"});
  rec.ondataavailable=e=>chunks.push(e.data);
  rec.onstop=()=>{
