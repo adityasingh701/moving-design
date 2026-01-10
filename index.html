@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart India Hub – Designs</title>
+<style>
+body{
+    margin:0;
+    background:black;
+    overflow:hidden;
+    font-family:Arial;
+}
+#controls{
+    position:fixed;
+    top:10px;
+    left:10px;
+    z-index:10;
+    background:rgba(0,0,0,0.7);
+    padding:12px;
+    border-radius:8px;
+    color:white;
+}
+input,button{
+    margin-top:5px;
+    padding:6px;
+    width:110px;
+}
+canvas{
+    display:block;
+    margin:auto;
+}
+</style>
+</head>
+<body>
+
+<div id="controls">
+Rotation<br>
+<input id="rot" type="number" value="50"><br>
+<button onclick="start()">Download Reel</button>
+</div>
+
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+// 9:16 Reel Size
+canvas.width = 1080;
+canvas.height = 1920;
+
+let recorder, chunks = [];
+
+function hsvToRgb(h,s,v){
+    let f = (n, k=(n+h*6)%6) => v - v*s*Math.max(Math.min(k,4-k,1),0);
+    return [
+        Math.floor(f(5)*255),
+        Math.floor(f(3)*255),
+        Math.floor(f(1)*255)
+    ];
+}
+
+function drawWatermark(){
+    ctx.font = "32px Arial";
+    ctx.fillStyle = "rgba(255,255,255,0.25)";
+    ctx.fillText("Smart India Hub", canvas.width-320, canvas.height-40);
+}
+
+function circle(x,y,r,rot){
+    ctx.beginPath();
+    for(let a=0;a<=360;a+=4){
+        let ang=(a+rot)*Math.PI/180;
+        ctx.lineTo(x+Math.cos(ang)*r,y+Math.sin(ang)*r);
+    }
+    ctx.closePath();
+    ctx.stroke();
+}
+
+function filledCircle(x,y,r,rot){
+    ctx.beginPath();
+    for(let a=0;a<=360;a+=4){
+        let ang=(a+rot)*Math.PI/180;
+        ctx.lineTo(x+Math.cos(ang)*r,y+Math.sin(ang)*r);
+    }
+    ctx.closePath();
+    ctx.fill();
+}
+
+async function startRecording(){
+    const stream = canvas.captureStream(60);
+    recorder = new MediaRecorder(stream,{mimeType:"video/webm"});
+    recorder.ondataavailable=e=>chunks.push(e.data);
+    recorder.onstop=saveVideo;
+    recorder.start();
+}
+
+function saveVideo(){
+    const blob=new Blob(chunks,{type:"video/webm"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download="SmartIndiaHub_Reel.webm";
+    a.click();
+    URL.revokeObjectURL(url);
+    chunks=[];
+}
+
+async function start(){
+    await startRecording();
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.lineWidth=2;
+
+    let x=canvas.width/2;
+    let y=canvas.height/2;
+    let angle=0;
+    let h=0;
+    let rot=parseFloat(document.getElementById("rot").value);
+
+    for(let i=0;i<240;i++){
+        let rgb=hsvToRgb(h,1,1);
+        h+=0.011;
+        ctx.strokeStyle=`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+        ctx.fillStyle=ctx.strokeStyle;
+
+        circle(x,y,i*3,angle);
+        angle+=rot;
+
+        filledCircle(x,y,i*3-10,angle);
+        angle+=55;
+
+        circle(x,y,30,angle);
+
+        drawWatermark();
+        await new Promise(r=>setTimeout(r,25));
+    }
+
+    recorder.stop();
+}
+</script>
+
+</body>
+</html>
+
