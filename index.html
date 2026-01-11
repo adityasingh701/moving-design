@@ -6,9 +6,9 @@
 <style>
 body{margin:0;background:black;overflow:hidden;font-family:Arial}
 #ui{
- position:fixed;top:10px;left:10px;
+ position:fixed;top:15px;left:15px;
  background:rgba(0,0,0,.7);color:white;
- padding:12px;border-radius:8px;z-index:10
+ padding:22px;border-radius:15px;z-index:10
 }
 input,button{margin-top:6px;padding:6px;width:120px}
 canvas{display:block;margin:auto}
@@ -88,14 +88,14 @@ function turtleCircleFill(radius,extent){
 
 // watermark
 function watermark(){
- ctx.font="32px Arial";
+ ctx.font="22px Arial";
  ctx.fillStyle="rgba(255,255,255,.25)";
  ctx.fillText("Smart India Hub",canvas.width-350,canvas.height-40);
 }
 
 // video
 async function record(){
- const stream=canvas.captureStream(120);
+ const stream=canvas.captureStream(720);
  rec=new MediaRecorder(stream,{mimeType:"video/webm"});
  rec.ondataavailable=e=>chunks.push(e.data);
  rec.onstop=()=>{
