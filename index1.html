@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Smart India Hub – Moving Design</title>
+<style>
+body{
+  margin:0;
+  background:black;
+  overflow:hidden;
+  font-family:Arial;
+}
+#panel{
+  position:fixed;
+  top:20px;
+  left:20px;
+  background:rgba(0,0,0,0.75);
+  padding:18px;
+  border-radius:12px;
+  color:white;
+  z-index:10;
+  width:220px;
+}
+#panel input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  font-size:16px;
+}
+#panel button{
+  width:100%;
+  padding:12px;
+  margin-top:12px;
+  font-size:16px;
+  cursor:pointer;
+}
+canvas{
+  display:block;
+  margin:auto;
+}
+</style>
+</head>
+<body>
+
+<div id="panel">
+<b>Rotation (rt)</b>
+<input id="rot" type="number" value="50">
+<button onclick="start()">Redraw</button>
+</div>
+
+<canvas id="c"></canvas>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+// Bigger than before
+canvas.width = 1400;
+canvas.height = 1400;
+
+// Turtle
+let turtle;
+
+function resetTurtle(){
+ turtle={
+   x:canvas.width/2,
+   y:canvas.height/2,
+   a:0
+ };
+}
+
+function hsv(h,s,v){
+ let f=(n,k=(n+h*6)%6)=>v-v*s*Math.max(Math.min(k,4-k,1),0);
+ return [f(5)*255,f(3)*255,f(1)*255];
+}
+
+function forward(d){
+ turtle.x+=Math.cos(turtle.a)*d;
+ turtle.y+=Math.sin(turtle.a)*d;
+}
+
+function right(a){
+ turtle.a+=a*Math.PI/180;
+}
+
+function turtleArc(radius,extent,fill=false){
+ let steps=80;
+ let step=extent/steps;
+ let len=2*Math.PI*radius*(extent/360)/steps;
+
+ ctx.beginPath();
+ ctx.moveTo(turtle.x,turtle.y);
+ for(let i=0;i<steps;i++){
+   right(step);
+   forward(len);
+   ctx.lineTo(turtle.x,turtle.y);
+ }
+ if(fill) ctx.fill(); else ctx.stroke();
+}
+
+function start(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ resetTurtle();
+ ctx.lineWidth=2;
+
+ let rot=parseFloat(document.getElementById("rot").value);
+ let h=0;
+
+ for(let i=0;i<200;i++){
+   let rgb=hsv(h,1,1);
+   h+=0.011;
+   ctx.strokeStyle=`rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+   ctx.fillStyle=ctx.strokeStyle;
+
+   turtleArc(i*1.4,100,false);   // slightly scaled up
+   right(rot);
+
+   turtleArc(i*1.4,90,true);
+   right(55);
+
+   turtleArc(14,70,false);
+ }
+}
+
+start();
+</script>
+
+</body>
+</html>
+
