@@ -95,7 +95,7 @@ function watermark(){
 
 // video
 async function record(){
- const stream=canvas.captureStream(720);
+ const stream=canvas.captureStream(2160);
  rec=new MediaRecorder(stream,{mimeType:"video/webm"});
  rec.ondataavailable=e=>chunks.push(e.data);
  rec.onstop=()=>{
